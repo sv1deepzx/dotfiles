@@ -1,0 +1,15 @@
+[misc]
+pre_sudo = true
+cleanup = true
+show_skipped = true
+disable = ["conda", "vagrant", "firmware"]
+
+[linux]
+arch_package_manager = "paru"
+show_arch_news = true
+
+[git]
+repos = ["~/.local/share/chezmoi"]
+
+[firmware]
+upgrade = false
