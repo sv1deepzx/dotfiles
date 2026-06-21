@@ -72,10 +72,16 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Aliases
-alias ls='ls --color'
+alias claude-home-session=claude --resume home-session
+alias ls='ls -lrta --color'
 alias c='clear'
 [[ -f ~/.ssh/aliases ]] && source ~/.ssh/aliases
 alias keepawake='systemd-inhibit --what=idle:sleep --who="keepawake" --why="manual override" sleep infinity'
+findgits() {
+  local exclude=("/.snapshots")
+  local pattern=$(IFS='|'; echo "^(${exclude[*]})")
+  find / -name ".git" -type d -prune 2>/dev/null | grep -Ev "$pattern" | sed 's|/.git$||'
+}
 
 # SDKMAN configuration
 export SDKMAN_DIR="$HOME/.sdkman"
