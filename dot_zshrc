@@ -77,6 +77,23 @@ alias ls='ls -lrta --color'
 alias c='clear'
 [[ -f ~/.ssh/aliases ]] && source ~/.ssh/aliases
 alias keepawake='systemd-inhibit --what=idle:sleep --who="keepawake" --why="manual override" sleep infinity'
+
+# Quick PR review: cd into local repo, gwip current changes, checkout PR branch
+qr() {
+  local url=$1
+  local pr="${url##*/}"
+  local repo="${${url%/pull/*}##*/}"
+  local repo_dir=$(find ~/Projects -maxdepth 2 -type d -name "$repo" | head -1)
+
+  if [[ -z "$repo_dir" ]]; then
+    echo "qrev: repo '$repo' not found in ~/Projects"
+    return 1
+  fi
+
+  cd "$repo_dir" || return 1
+  gwip
+  gh pr checkout "$pr"
+}
 findgits() {
   local exclude=("/.snapshots")
   local pattern=$(IFS='|'; echo "^(${exclude[*]})")
