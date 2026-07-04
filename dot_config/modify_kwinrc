@@ -1,0 +1,84 @@
+#!/usr/bin/awk -f
+# modify_kwinrc — chezmoi modify_ script.
+#
+# chezmoi feeds the CURRENT ~/.config/kwinrc on stdin; our stdout becomes the
+# managed target state. We pass EVERYTHING through unchanged — including the
+# volatile [Tiling][<uuid>] blocks KWin constantly regenerates — and only enforce
+# the settings listed in BEGIN below. Net effect: kwinrc stops showing spurious
+# diffs, while the handful of settings we actually care about stay reproducible.
+#
+# Manage another setting:  want["Group" SUBSEP "Key"] = "Value"
+# (Group is the [Section] header without the brackets.)
+
+BEGIN {
+    want["Desktops" SUBSEP "Number"]                = "10"
+    want["Desktops" SUBSEP "Rows"]                  = "1"
+    want["Desktops" SUBSEP "Name_9"]                = "Desktop 10"
+    want["Effect-overview" SUBSEP "BorderActivate"] = "9"
+    want["Plugins" SUBSEP "translucencyEnabled"]    = "true"
+    want["Xwayland" SUBSEP "Scale"]                 = "1"
+    section = ""
+}
+
+# Section header: [Group] or nested [Group][Sub]. Match on the first [Group].
+/^\[/ {
+    flush_section(section)
+    section = substr($0, 2, index($0, "]") - 2)
+    print
+    next
+}
+
+# key=value line (ignore comments)
+(index($0, "=") > 0 && $0 !~ /^[#;]/) {
+    key = $0
+    sub(/=.*/, "", key)
+    k = section SUBSEP key
+    if (k in want) {
+        print key "=" want[k]
+        seen[k] = 1
+        next
+    }
+    print
+    next
+}
+
+# blank lines, comments, anything else
+{ print }
+
+END {
+    flush_section(section)
+    flush_missing()
+}
+
+# Append any wanted keys that belong to `sec` but weren't present in it.
+function flush_section(sec,   k, parts) {
+    if (sec == "") return
+    for (k in want) {
+        if (k in seen) continue
+        split(k, parts, SUBSEP)
+        if (parts[1] == sec) {
+            print parts[2] "=" want[k]
+            seen[k] = 1
+        }
+    }
+}
+
+# Append whole sections that never appeared in the input at all.
+function flush_missing(   k, parts, sec, list, n, i) {
+    n = 0
+    for (k in want) {
+        if (k in seen) continue
+        split(k, parts, SUBSEP)
+        sec = parts[1]
+        if (!(sec in mark)) { mark[sec] = 1; list[++n] = sec }
+    }
+    for (i = 1; i <= n; i++) {
+        print ""
+        print "[" list[i] "]"
+        for (k in want) {
+            if (k in seen) continue
+            split(k, parts, SUBSEP)
+            if (parts[1] == list[i]) { print parts[2] "=" want[k]; seen[k] = 1 }
+        }
+    }
+}

@@ -79,7 +79,7 @@ alias c='clear'
 alias keepawake='systemd-inhibit --what=idle:sleep --who="keepawake" --why="manual override" sleep infinity'
 
 # Quick PR review: cd into local repo, gwip current changes, checkout PR branch
-qr() {
+qrev() {
   local url=$1
   local pr="${url##*/}"
   local repo="${${url%/pull/*}##*/}"
