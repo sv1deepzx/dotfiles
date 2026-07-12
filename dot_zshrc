@@ -77,6 +77,20 @@ alias ls='ls -lrta --color'
 alias c='clear'
 [[ -f ~/.ssh/aliases ]] && source ~/.ssh/aliases
 alias keepawake='systemd-inhibit --what=idle:sleep --who="keepawake" --why="manual override" sleep infinity'
+# Packages I've installed since provisioning this machine (~/.local/state/deps-cutoff).
+# Pass -a/--all to also include the installer's pre-provisioning packages.
+deps() {
+  local cutoff_file="${XDG_STATE_HOME:-$HOME/.local/state}/deps-cutoff"
+  local cutoff=""; [[ $1 != -a && $1 != --all && -f $cutoff_file ]] && cutoff=$(<"$cutoff_file")
+  join <(pacman -Qettq | sort) \
+       <(awk '$3=="installed" && !s[$4]++ {t=$1; gsub(/[][]/,"",t); print $4, t}' /var/log/pacman.log | sort -k1,1) \
+    | sort -k2 \
+    | awk -v c="$cutoff" 'c=="" || substr($2,1,19) > substr(c,1,19)' \
+    | column -t
+}
+# Re-snapshot packages.sh from the current system (what `deps` shows, for bootstrap).
+alias gendeps='~/.local/share/chezmoi/gen-packages.sh'
+
 
 # Quick PR review: cd into local repo, gwip current changes, checkout PR branch
 qrev() {
