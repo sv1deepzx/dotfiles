@@ -38,9 +38,10 @@ Skip it and bootstrap just warns and moves on — re-run it later once the key i
 ```
 
 In order, it: records the provisioning cutoff → installs your packages (repo + AUR +
-language) → removes unwanted packages (asks first) → clones your repos → sets up the
-pacman-cache and btrfs-snapshot cleanup timers. Needs your sudo password. Idempotent —
-safe to re-run.
+language, pulling in `paru` for AUR if missing) → switches your login shell to zsh →
+removes unwanted packages (asks first) → clones your repos → sets up the pacman-cache
+and btrfs-snapshot cleanup timers. Needs your sudo password. Idempotent — safe to
+re-run. The shell switch takes effect at your next login (step 5).
 
 ### 4. Apply the dotfiles
 

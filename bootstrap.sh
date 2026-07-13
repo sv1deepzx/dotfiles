@@ -72,6 +72,7 @@ fi
 
 # 2. Install AUR packages ----------------------------------------------------------
 if ((${#AUR_PKGS[@]})); then
+    command -v paru >/dev/null || sudo pacman -S --needed --noconfirm paru  # CachyOS repo
     if command -v paru >/dev/null; then
         msg "Installing ${#AUR_PKGS[@]} AUR package(s)"
         paru -S --needed --noconfirm "${AUR_PKGS[@]}" || warn "some AUR packages failed"
@@ -100,7 +101,16 @@ if ((${#PIPX_PKGS[@]})); then
     else warn "pipx not found — run: sudo pacman -S python-pipx"; fi
 fi
 
-# 4. Remove unwanted packages ------------------------------------------------------
+# 4. Default shell: fish → zsh -----------------------------------------------------
+# CachyOS ships fish as the login shell; switch to zsh (dot_zshrc expects it).
+sudo pacman -S --needed --noconfirm zsh
+zsh_path="$(command -v zsh)"
+if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "$zsh_path" ]]; then
+    msg "Setting default shell to zsh"
+    sudo chsh -s "$zsh_path" "$USER" || warn "chsh failed — set the shell manually"
+fi
+
+# 5. Remove unwanted packages ------------------------------------------------------
 if ((${#REMOVE_PKGS[@]})); then
     installed=()
     for p in "${REMOVE_PKGS[@]}"; do
@@ -114,7 +124,7 @@ if ((${#REMOVE_PKGS[@]})); then
     fi
 fi
 
-# 5. Clone repos -------------------------------------------------------------------
+# 6. Clone repos -------------------------------------------------------------------
 if ((${#REPOS[@]})); then
     msg "Cloning repos into $PROJECTS_DIR"
     mkdir -p "$PROJECTS_DIR"
@@ -131,7 +141,7 @@ if ((${#REPOS[@]})); then
     done
 fi
 
-# 6. System maintenance: cache + snapshot cleanup ----------------------------------
+# 7. System maintenance: cache + snapshot cleanup ----------------------------------
 msg "Configuring maintenance timers"
 sudo pacman -S --needed --noconfirm snapper pacman-contrib
 
