@@ -25,6 +25,18 @@ REPOS=(
     # git@github.com:sv1deepzx/some-project.git
 )
 
+# Language-level packages NOT covered by pacman/AUR. gen-packages.sh can't detect
+# these, so track them here by hand. TODO: fill in as you settle on them.
+NPM_PKGS=(     # global installs via `npm install -g` (needs nodejs/npm)
+    # TODO: e.g. some-cli
+)
+CARGO_PKGS=(   # crates via `cargo install` (needs rust)
+    # TODO: e.g. some-crate
+)
+PIPX_PKGS=(    # Python CLIs via pipx — global pip is blocked on Arch (PEP 668)
+    # TODO: e.g. some-tool
+)
+
 # ──────────────────────────────────────────────────────────────────────────────
 
 msg()  { printf '\n\033[1;36m==>\033[0m %s\n' "$*"; }
@@ -68,7 +80,27 @@ if ((${#AUR_PKGS[@]})); then
     fi
 fi
 
-# 3. Remove unwanted packages ------------------------------------------------------
+# 3. Language-level packages (npm / cargo / pipx) ----------------------------------
+if ((${#NPM_PKGS[@]})); then
+    if command -v npm >/dev/null; then
+        msg "Installing ${#NPM_PKGS[@]} npm global(s)"
+        sudo npm install -g "${NPM_PKGS[@]}" || warn "some npm packages failed"
+    else warn "npm not found — skipping (${NPM_PKGS[*]})"; fi
+fi
+if ((${#CARGO_PKGS[@]})); then
+    if command -v cargo >/dev/null; then
+        msg "Installing ${#CARGO_PKGS[@]} cargo crate(s)"
+        cargo install "${CARGO_PKGS[@]}" || warn "some crates failed"
+    else warn "cargo not found — skipping (${CARGO_PKGS[*]})"; fi
+fi
+if ((${#PIPX_PKGS[@]})); then
+    if command -v pipx >/dev/null; then
+        msg "Installing ${#PIPX_PKGS[@]} pipx tool(s)"
+        for p in "${PIPX_PKGS[@]}"; do pipx install "$p" || warn "pipx: $p failed"; done
+    else warn "pipx not found — run: sudo pacman -S python-pipx"; fi
+fi
+
+# 4. Remove unwanted packages ------------------------------------------------------
 if ((${#REMOVE_PKGS[@]})); then
     installed=()
     for p in "${REMOVE_PKGS[@]}"; do
@@ -82,7 +114,7 @@ if ((${#REMOVE_PKGS[@]})); then
     fi
 fi
 
-# 4. Clone repos -------------------------------------------------------------------
+# 5. Clone repos -------------------------------------------------------------------
 if ((${#REPOS[@]})); then
     msg "Cloning repos into $PROJECTS_DIR"
     mkdir -p "$PROJECTS_DIR"
@@ -99,7 +131,7 @@ if ((${#REPOS[@]})); then
     done
 fi
 
-# 5. System maintenance: cache + snapshot cleanup ----------------------------------
+# 6. System maintenance: cache + snapshot cleanup ----------------------------------
 msg "Configuring maintenance timers"
 sudo pacman -S --needed --noconfirm snapper pacman-contrib
 
