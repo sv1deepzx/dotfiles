@@ -52,11 +52,23 @@ chezmoi apply
 Run this **after** bootstrap, so the tools the configs expect (starship, zoxide, fzf…)
 already exist and your first shell isn't full of "command not found".
 
-### 5. Finishing touches
+### 5. Reboot, then finishing touches
+
+**Reboot after applying.** `chezmoi apply` only writes files; the login shell switch
+(fish → zsh) and the new `~/.zshrc` don't take effect until you start a fresh session,
+and KDE reads `kglobalshortcutsrc`/`kwinrc` cleanly at session start. A reboot is the
+simplest way to pick all of it up.
+
+Then:
 
 - Set the wallpaper from `~/.local/share/chezmoi/Nordic-mountain-wallpaper.jpg`
   (System Settings → Wallpaper).
-- Log out and back in (or reboot) to pick up the zsh, KDE, and service changes.
+- **KDE global shortcuts** are only semi-reproducible — `kglobalacceld` owns
+  `kglobalshortcutsrc` and rewrites it from its own state, so the tracked file doesn't
+  reliably apply. Instead, import the saved scheme by hand: System Settings → Shortcuts →
+  `⋮` → **Import Shortcut Scheme…** → pick `~/.local/share/chezmoi/kde_files/shortcuts-file.kksrc`
+  → **Apply**. (Regenerate it from a configured machine with *Save Shortcuts Scheme…*.)
+- First `tmux` launch auto-installs tpm and its plugins (no `prefix+I` needed).
 
 ## Why this order
 
