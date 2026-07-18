@@ -30,8 +30,8 @@ wmclass=kitty
 wmclassmatch=1
 
 [General]
-count=5
-rules=3bdaf964-e258-4efe-b8b7-85e7deaa77b8,9c68619c-48c0-4a44-b763-7ebb06375cea,c262bd7a-04a2-4317-8c09-460e1e9e68d6,6dbaeaab-10ce-4bdf-a749-9a65837dfb2b,000c32a0-1615-49a1-b9c9-f6093af89fb6
+count=6
+rules=3bdaf964-e258-4efe-b8b7-85e7deaa77b8,9c68619c-48c0-4a44-b763-7ebb06375cea,c262bd7a-04a2-4317-8c09-460e1e9e68d6,6dbaeaab-10ce-4bdf-a749-9a65837dfb2b,000c32a0-1615-49a1-b9c9-f6093af89fb6,e198cfb7-eac9-484c-86fa-008ce7645de1
 
 [c262bd7a-04a2-4317-8c09-460e1e9e68d6]
 Description=brave
@@ -39,4 +39,11 @@ desktops=3aaed2b6-f7be-4c50-a737-7d234fc0d73a
 desktopsrule=2
 wmclass=brave brave-browser
 wmclasscomplete=true
+wmclassmatch=1
+
+[e198cfb7-eac9-484c-86fa-008ce7645de1]
+Description=intelliJ
+desktops=7b99de7a-154c-431d-a0db-6a105c88401c
+desktopsrule=2
+wmclass=jetbrains-idea
 wmclassmatch=1
