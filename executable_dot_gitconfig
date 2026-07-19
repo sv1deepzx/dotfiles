@@ -1,3 +1,15 @@
 [user]
 	email = sdeepzx+gh@gmail.com
 	name = sv1deepzx
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false
+[merge]
+	conflictStyle = zdiff3
+[diff]
+	colorMoved = default

@@ -2,7 +2,7 @@
 pre_sudo = true
 cleanup = true
 show_skipped = true
-disable = ["conda", "vagrant", "firmware"]
+disable = ["conda", "vagrant", "firmware","containers"]
 
 [linux]
 arch_package_manager = "paru"
